@@ -1,27 +1,29 @@
 // SPDX-License-Identifier: MIT
 
-// n° contract : 0x7302764434ae55d4fa39ac50f9ee5fbf73a48dbd
+// testnet : Rinkeby
+// n° contract: 0xC7cE2Aa99D4e3DaAfc78D33c8D31f0583AEC7e34
 // address owner : 0xe39D23Bf5b87cb6a8DCE793631E2848A4EF1E95c
 
 pragma solidity ^0.8.0;
 
 //importation
-//import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Address.sol";
+
 
 contract Birthday {
     //librairies
-    //using Address for address payable;
     
     //status des variables
     address private _owner;
-    mapping(address => uint256) private _balances;
+    uint256 private _timeStamp;
     
     // evenements
-    event Transfered(address indexed sender, address indexed recipient, uint256 amount);
+    event Transfered(address indexed sender, uint256 amount);
+    event Offred(address indexed sender, uint256 amount);
     
     //constructeur
-    constructor(address owner_) {
+    constructor(address owner_, uint256 birthday_) {
         _owner = owner_;
+        _timeStamp = block.timestamp+(birthday_ * 1 days);
     }
     
     //modifieurs
@@ -31,35 +33,39 @@ contract Birthday {
     }
     
     //fonctions
-    function offer() public payable {
-        _balances[msg.sender] += msg.value;
-        _balances[msg.sender] -= msg.value;
-        _balances[_owner] += msg.value;
-        emit Transfered(msg.sender, _owner, msg.value);
+    receive() external payable {
+        _offer(msg.sender, msg.value);
+    }
+    
+    fallback() external {
+        
+    }
+    
+    function offer() external payable {
+        require(msg.value > 0, "Birthday: can not offer 0 ether");
+        _offer(msg.sender, msg.value);
+        emit Transfered(msg.sender, msg.value);
     }
     
     function getPresent() public onlyOwner {
-        require(_balances[_owner] > 0, "SmartWallet: can not withdraw 0 ether");
-        uint256 amount = _balances[_owner];
-        _balances[_owner] = 0;
-        payable(msg.sender).transfer(amount);
+        require(block.timestamp > _timeStamp, "This is not your birthday yet.");
+        require(address(this).balance > 0, "Birthday: can not withdraw 0 ether");
+        payable(msg.sender).transfer(address(this).balance);
     }
     
     function owner() public view returns(address) {
         return _owner;
     }
     
-    /*
-    function balance(address account) public view returns(uint256) {
-        return _balances[account];
-    }
-    */
-    
-    function balanceOwner() public view returns(uint256) {
-        return _balances[_owner];
+    function myBirthday() public view returns(uint256){
+        return _timeStamp;
     }
     
     function total() public view returns (uint256) {
         return address(this).balance;
+    }
+    
+    function _offer(address sender, uint256 amount) private {
+        emit Offred(sender, amount);
     }
 }
