@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 
+// n° contract : 0x7302764434ae55d4fa39ac50f9ee5fbf73a48dbd
+// address owner : 0xe39D23Bf5b87cb6a8DCE793631E2848A4EF1E95c
+
 pragma solidity ^0.8.0;
+
 //importation
 //import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Address.sol";
 
