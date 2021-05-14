@@ -17,8 +17,8 @@ contract Birthday {
     uint256 private _timeStamp;
     
     // evenements
-    event Transfered(address indexed sender, uint256 amount);
-    event Offred(address indexed sender, uint256 amount);
+    event Transfered(address indexed sender, uint256 value);
+    event Offered(address indexed sender, uint256 value);
     
     //constructeur
     constructor(address owner_, uint256 birthday_) {
@@ -48,7 +48,7 @@ contract Birthday {
     }
     
     function getPresent() public onlyOwner {
-        require(block.timestamp > _timeStamp, "Birthday: This is not your birthday yet.");
+        require(block.timestamp > _timeStamp, "Bhirthday: This is not your birthday yet.");
         require(address(this).balance > 0, "Birthday: can not withdraw 0 ether");
         payable(msg.sender).transfer(address(this).balance);
     }
@@ -58,14 +58,15 @@ contract Birthday {
     }
     
     function myBirthday() public view returns(uint256){
-        return _timeStamp;
+        require(_timeStamp >= block.timestamp, "Bhirthday: Your birthday has past.");
+        return _timeStamp-block.timestamp;
     }
     
     function total() public view returns (uint256) {
         return address(this).balance;
     }
     
-    function _offer(address sender, uint256 amount) private {
-        emit Offred(sender, amount);
+    function _offer(address sender, uint256 value) private {
+        emit Offered(sender, value);
     }
 }
